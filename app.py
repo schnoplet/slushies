@@ -5,8 +5,12 @@ app = Flask(__name__)
 
 def get_weather(lat, lon):
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
-    res = requests.get(url).json()
-    return res.get("current_weather", None)
+    try:
+        res = requests.get(url, timeout=5)
+        data = res.json()
+        return data.get("current_weather", None)
+    except:
+        return None
 
 @app.route("/")
 def home():
@@ -18,17 +22,19 @@ def weather():
     lon = request.form.get("lon")
 
     if not lat or not lon:
-        return "Location not provided"
+        return render_template("home.html", error="Location not provided")
 
     weather = get_weather(lat, lon)
 
     if not weather:
-        return "Weather unavailable"
+        return render_template("home.html", error="Weather unavailable")
 
     return render_template(
         "result.html",
         temp=weather["temperature"],
-        wind=weather["windspeed"]
+        wind=weather["windspeed"],
+        lat=lat,
+        lon=lon
     )
 
 if __name__ == "__main__":

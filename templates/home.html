@@ -11,6 +11,10 @@
 
 <p id="status"></p>
 
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
 <script>
 function getLocation() {
     const status = document.getElementById("status");
@@ -29,7 +33,7 @@ function getLocation() {
 
             document.getElementById("locForm").submit();
         },
-        () => {
+        (error) => {
             status.innerText = "Permission denied or failed";
         }
     );
